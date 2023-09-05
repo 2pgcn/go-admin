@@ -341,11 +341,22 @@ func (h *Handler) Export(ctx *context.Context) {
 	tableName := "Sheet1"
 	prefix := ctx.Query(constant.PrefixKey)
 	panel := h.table(prefix, ctx)
-
-	f := excelize.NewFile()
-	index := f.NewSheet(tableName)
-	f.SetActiveSheet(index)
-
+	var f *excelize.File
+	if strings.Contains(ctx.Path(), "mediate_userinfo") {
+		var err error
+		f, err = excelize.OpenFile("./mediate_userinfo.xlsx")
+		if err != nil {
+			fmt.Println(err)
+			response.Error(ctx, "系统错误 请联系管理员")
+			return
+		}
+		index := f.GetSheetIndex("Sheet1")
+		f.SetActiveSheet(index)
+	} else {
+		f = excelize.NewFile()
+		index := f.NewSheet(tableName)
+		f.SetActiveSheet(index)
+	}
 	var (
 		infoData  table.PanelInfo
 		fileName  string
