@@ -342,6 +342,7 @@ func (h *Handler) Export(ctx *context.Context) {
 	prefix := ctx.Query(constant.PrefixKey)
 	panel := h.table(prefix, ctx)
 	var f *excelize.File
+	fieldMaps := map[string]bool{"user_click_type": true, "用户选择类型": true}
 	if strings.Contains(ctx.Path(), "mediate_userinfo") {
 		var err error
 		f, err = excelize.OpenFile("./mediate_userinfo.xlsx")
@@ -410,7 +411,7 @@ func (h *Handler) Export(ctx *context.Context) {
 
 	columnIndex := 0
 	for _, head := range infoData.Thead {
-		if !head.Hide {
+		if !head.Hide && !fieldMaps[head.Head] {
 			f.SetCellValue(tableName, orders[columnIndex]+"1", head.Head)
 			columnIndex++
 		}
@@ -420,7 +421,7 @@ func (h *Handler) Export(ctx *context.Context) {
 	for _, info := range infoData.InfoList {
 		columnIndex = 0
 		for _, head := range infoData.Thead {
-			if !head.Hide {
+			if !head.Hide && !fieldMaps[head.Head] {
 				if tableInfo.IsExportValue() {
 					f.SetCellValue(tableName, orders[columnIndex]+strconv.Itoa(count), info[head.Field].Value)
 				} else {
