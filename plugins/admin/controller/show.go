@@ -441,7 +441,7 @@ func (h *Handler) Export(ctx *context.Context) {
 		return
 	}
 	if strings.Contains(ctx.Path(), "mediate_userinfo") {
-		fileName = "案件管理" + time.Now().Format("2006-01-02")
+		fileName = "案件管理" + time.Now().Format("2006-01-02") + ".xlsx"
 	}
 
 	ctx.AddHeader("content-disposition", `attachment; filename=`+fileName)
