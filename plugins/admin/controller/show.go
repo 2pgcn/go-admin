@@ -4,14 +4,6 @@ import (
 	"bytes"
 	"crypto/md5"
 	"fmt"
-	template2 "html/template"
-	"mime"
-	"net/http"
-	"path"
-	"strconv"
-	"strings"
-	"time"
-
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/GoAdminGroup/go-admin/context"
 	"github.com/GoAdminGroup/go-admin/modules/auth"
@@ -30,6 +22,13 @@ import (
 	"github.com/GoAdminGroup/go-admin/template/types"
 	"github.com/GoAdminGroup/go-admin/template/types/action"
 	"github.com/GoAdminGroup/html"
+	template2 "html/template"
+	"mime"
+	"net/http"
+	"path"
+	"strconv"
+	"strings"
+	"time"
 )
 
 // ShowInfo show info page.
@@ -423,7 +422,9 @@ func (h *Handler) Export(ctx *context.Context) {
 		for _, head := range infoData.Thead {
 			if !head.Hide && !fieldMaps[head.Head] {
 				if tableInfo.IsExportValue() {
-					f.SetCellValue(tableName, orders[columnIndex]+strconv.Itoa(count), info[head.Field].Value)
+					//f.SetCellStyle("Sheet1", orders[columnIndex]+strconv.Itoa(count),
+					//	info[head.Field].Value, 22)
+					f.SetCellValue(tableName, orders[columnIndex]+strconv.Itoa(count), "'"+info[head.Field].Value)
 				} else {
 					f.SetCellValue(tableName, orders[columnIndex]+strconv.Itoa(count), info[head.Field].Content)
 				}
@@ -439,7 +440,120 @@ func (h *Handler) Export(ctx *context.Context) {
 		response.Error(ctx, "export error")
 		return
 	}
+	if strings.Contains(ctx.Path(), "mediate_userinfo") {
+		fileName = "案件管理" + time.Now().Format("2006-01-02")
+	}
 
 	ctx.AddHeader("content-disposition", `attachment; filename=`+fileName)
 	ctx.Data(200, "application/vnd.ms-excel", buf.Bytes())
 }
+
+//// Export export table rows as excel object.
+//func (h *Handler) Export(ctx *context.Context) {
+//	param := guard.GetExportParam(ctx)
+//
+//	tableName := "Sheet1"
+//	prefix := ctx.Query(constant.PrefixKey)
+//	panel := h.table(prefix, ctx)
+//	var f *excelize.File
+//	fieldMaps := map[string]bool{"user_click_type": true, "用户选择类型": true}
+//	if strings.Contains(ctx.Path(), "mediate_userinfo") {
+//		var err error
+//		f, err = excelize.OpenFile("./mediate_userinfo.xlsx")
+//		if err != nil {
+//			fmt.Println(err)
+//			response.Error(ctx, "系统错误 请联系管理员")
+//			return
+//		}
+//		index := f.GetSheetIndex("Sheet1")
+//		f.SetActiveSheet(index)
+//	} else {
+//		f = excelize.NewFile()
+//		index := f.NewSheet(tableName)
+//		f.SetActiveSheet(index)
+//	}
+//	var (
+//		infoData  table.PanelInfo
+//		fileName  string
+//		err       error
+//		tableInfo = panel.GetInfo()
+//		params    parameter.Parameters
+//	)
+//
+//	if fn := panel.GetInfo().ExportProcessFn; fn != nil {
+//		params = parameter.GetParam(ctx.Request.URL, tableInfo.DefaultPageSize, tableInfo.SortField,
+//			tableInfo.GetSort())
+//		p, err := fn(params.WithIsAll(param.IsAll))
+//		if err != nil {
+//			response.Error(ctx, "export error")
+//			return
+//		}
+//		infoData.Thead = p.Thead
+//		infoData.InfoList = p.InfoList
+//	} else {
+//		if len(param.Id) == 0 {
+//			params = parameter.GetParam(ctx.Request.URL, tableInfo.DefaultPageSize, tableInfo.SortField,
+//				tableInfo.GetSort())
+//			infoData, err = panel.GetData(params.WithIsAll(param.IsAll))
+//			fileName = fmt.Sprintf("%s-%d-page-%s-pageSize-%s.xlsx", tableInfo.Title, time.Now().Unix(),
+//				params.Page, params.PageSize)
+//		} else {
+//			infoData, err = panel.GetDataWithIds(parameter.GetParam(ctx.Request.URL,
+//				tableInfo.DefaultPageSize, tableInfo.SortField, tableInfo.GetSort()).WithPKs(param.Id...))
+//			fileName = fmt.Sprintf("%s-%d-id-%s.xlsx", tableInfo.Title, time.Now().Unix(), strings.Join(param.Id, "_"))
+//		}
+//		if err != nil {
+//			response.Error(ctx, "export error")
+//			return
+//		}
+//	}
+//
+//	// TODO: support any numbers of fields.
+//	orders := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
+//		"L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
+//
+//	if len(infoData.Thead) > 26 {
+//		j := -1
+//		for i := 0; i < len(infoData.Thead)-26; i++ {
+//			if i%26 == 0 {
+//				j++
+//			}
+//			letter := orders[j] + orders[i%26]
+//			orders = append(orders, letter)
+//		}
+//	}
+//
+//	columnIndex := 0
+//	for _, head := range infoData.Thead {
+//		if !head.Hide && !fieldMaps[head.Head] {
+//			f.SetCellValue(tableName, orders[columnIndex]+"1", head.Head)
+//			columnIndex++
+//		}
+//	}
+//
+//	count := 2
+//	for _, info := range infoData.InfoList {
+//		columnIndex = 0
+//		for _, head := range infoData.Thead {
+//			if !head.Hide && !fieldMaps[head.Head] {
+//				if tableInfo.IsExportValue() {
+//					f.SetCellValue(tableName, orders[columnIndex]+strconv.Itoa(count), info[head.Field].Value)
+//				} else {
+//					f.SetCellValue(tableName, orders[columnIndex]+strconv.Itoa(count), info[head.Field].Content)
+//				}
+//				columnIndex++
+//			}
+//		}
+//		count++
+//	}
+//
+//	buf, err := f.WriteToBuffer()
+//
+//	if err != nil || buf == nil {
+//		response.Error(ctx, "export error")
+//		return
+//	}
+//
+//	ctx.AddHeader("content-disposition", `attachment; filename=`+fileName)
+//	ctx.Data(200, "application/vnd.ms-excel", buf.Bytes())
+//}
