@@ -65,8 +65,8 @@ var List = map[string]string{"installation": `{{define "installation"}}
                             </div>
                         </section>
                         <!-- Copyright -->
-                        <div class="copyright">Copyright © 2018.Company name All rights reserved.<a target="_blank"
-                                                                                                    href="https://github.com/chenhg5/go-admin">GoAdmin</a>
+                        <div class="copyright">
+							<a target="_blank" href="https://beian.miit.gov.cn">黑ICP备-2023012515号</a>
                         </div>
                     </div>
 
@@ -131,8 +131,8 @@ var List = map[string]string{"installation": `{{define "installation"}}
                             </div>
                         </section>
                         <!-- Copyright -->
-                        <div class="copyright">Copyright © 2018.Company name All rights reserved.<a target="_blank"
-                                                                                                    href="https://github.com/chenhg5/go-admin">GoAdmin</a>
+                        <div class="copyright">
+							<a href="https://beian.miit.gov.cn">黑ICP备-2023012515号</a>
                         </div>
                     </div>
                 </div>
@@ -401,8 +401,8 @@ var List = map[string]string{"installation": `{{define "installation"}}
                             </div>
                         </section>
                         <!-- Copyright -->
-                        <div class="copyright">Copyright © 2018.Company name All rights reserved.<a target="_blank"
-                                                                                                    href="https://github.com/chenhg5/go-admin">GoAdmin</a>
+                        <div class="copyright">
+							<a target="_blank" href="https://beian.miit.gov.cn">黑ICP备-2023012515号</a>
                         </div>
                     </div>
                 </div>
@@ -445,8 +445,7 @@ var List = map[string]string{"installation": `{{define "installation"}}
                             </div>
                         </section>
                         <!-- Copyright -->
-                        <div class="copyright">Copyright © 2018.Company name All rights reserved.<a target="_blank"
-                                                                                                    href="https://github.com/chenhg5/go-admin">GoAdmin</a>
+                        <div class="copyright">
                         </div>
                     </div>
 
